@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".SettingsActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@color/white"
+        android:paddingHorizontal="@dimen/dp16">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="@dimen/dp14"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/back"
+                android:layout_width="@dimen/dp48"
+                android:layout_height="@dimen/dp48"
+                android:backgroundTint="@color/white"
+                app:icon="@drawable/baseline_arrow_back_24"
+                android:stateListAnimator="@null"
+                app:iconTint="@color/black" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/settings"
+                android:textColor="@color/black"
+                android:textSize="@dimen/sp26"
+                android:paddingLeft="@dimen/dp12">
+            </TextView>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="@dimen/dp24">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="@dimen/dp12">
+
+                <TextView
+                    android:layout_width="@dimen/dp0"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/dark_theme"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/sp16" />
+
+                <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    app:thumbTint="@color/teal"
+                    app:trackTint="@color/light_teal" />
+
+            </LinearLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp61"
+                android:backgroundTint="@color/white"
+                android:text="@string/share_app"
+                android:textColor="@color/black"
+                android:textSize="@dimen/sp16"
+                android:textAllCaps="false"
+                android:gravity="start|center_vertical"
+                app:icon="@drawable/baseline_share_24"
+                android:stateListAnimator="@null"
+                app:iconTint="@color/gray"
+                app:iconGravity="end"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp61"
+                android:backgroundTint="@color/white"
+                android:text="@string/write_supp"
+                android:textColor="@color/black"
+                android:textSize="@dimen/sp16"
+                android:textAllCaps="false"
+                android:gravity="start|center_vertical"
+                app:icon="@drawable/baseline_support_agent_24"
+                android:stateListAnimator="@null"
+                app:iconTint="@color/gray"
+                app:iconGravity="end"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp61"
+                android:backgroundTint="@color/white"
+                android:text="@string/user_agr"
+                android:textColor="@color/black"
+                android:textSize="@dimen/sp16"
+                android:textAllCaps="false"
+                android:gravity="start|center_vertical"
+                app:icon="@drawable/outline_arrow_forward_ios_24"
+                android:stateListAnimator="@null"
+                app:iconTint="@color/gray"
+                app:iconGravity="end"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
