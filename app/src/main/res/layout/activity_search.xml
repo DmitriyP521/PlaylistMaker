@@ -7,4 +7,70 @@
     android:layout_height="match_parent"
     tools:context=".SearchActivity">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="?attr/colorSecondary"
+        android:orientation="vertical"
+        android:paddingLeft="@dimen/dp16"
+        android:paddingRight="@dimen/dp16">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingTop="@dimen/dp14">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/back"
+                style="@style/BackArrowButtonStyle" />
+
+            <TextView
+                android:text="@string/search"
+                style="@style/HeaderTextViewStyle"/>
+
+        </LinearLayout>
+
+        <FrameLayout
+            android:layout_marginTop="@dimen/dp8"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dp36">
+
+            <EditText
+                android:id="@+id/searchEditText"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingHorizontal="@dimen/dp12"
+                android:paddingEnd="@dimen/dp36"
+                android:background="@drawable/rounded_edittext"
+                android:hint="@string/search"
+                style="@style/EditTextViewStyle"
+                android:textCursorDrawable="@color/blue"
+                android:inputType="text"
+                android:lines="1"
+                android:drawableStart="@drawable/baseline_search_18"
+                android:drawablePadding="@dimen/dp8"
+                android:fontFamily="@font/ys_display_medium"
+                android:textSize="@dimen/sp16"/>
+
+            <FrameLayout
+                android:id="@+id/clearIcon"
+                android:visibility="gone"
+                android:layout_width="@dimen/dp40"
+                android:layout_height="@dimen/dp36"
+                android:layout_gravity="end|center_vertical">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:src="@drawable/baseline_close_24"
+                    style="@style/EditTextIconStyle"/>
+            </FrameLayout>
+
+        </FrameLayout>
+
+    </LinearLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
