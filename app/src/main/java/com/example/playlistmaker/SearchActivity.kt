@@ -1,15 +1,20 @@
 package com.example.playlistmaker
 
+import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 
 class SearchActivity : AppCompatActivity() {
+
+    private var searchString: String = SEARCH_DEF
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
@@ -24,6 +29,9 @@ class SearchActivity : AppCompatActivity() {
 
         clearButton.setOnClickListener {
             searchEditText.setText("")
+            searchEditText.clearFocus()
+            val imm = searchEditText.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.hideSoftInputFromWindow(searchEditText.windowToken, 0)
         }
 
         val simpleTextWatcher = object : TextWatcher {
@@ -31,7 +39,7 @@ class SearchActivity : AppCompatActivity() {
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                clearButton.visibility = clearButtonVisibility(s)
+                clearButton.isVisible = !s.isNullOrEmpty()
                 searchString = s?.toString() ?: SEARCH_DEF
             }
 
@@ -39,16 +47,6 @@ class SearchActivity : AppCompatActivity() {
             }
         }
         searchEditText.addTextChangedListener(simpleTextWatcher)
-    }
-
-    private var searchString: String = SEARCH_DEF
-
-    private fun clearButtonVisibility(s: CharSequence?): Int {
-        return if (s.isNullOrEmpty()) {
-            View.GONE
-        } else {
-            View.VISIBLE
-        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -59,6 +57,8 @@ class SearchActivity : AppCompatActivity() {
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
         searchString = savedInstanceState.getString(SEARCH_REQUEST, searchString)
+        val searchEditText = findViewById<EditText>(R.id.searchEditText)
+        searchEditText.setText(searchString)
     }
 
     companion object {

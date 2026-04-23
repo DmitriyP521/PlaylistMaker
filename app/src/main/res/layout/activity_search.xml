@@ -24,10 +24,14 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/back"
+                android:layout_width="@dimen/dp48"
+                android:layout_height="@dimen/dp48"
                 style="@style/BackArrowButtonStyle" />
 
             <TextView
                 android:text="@string/search"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 style="@style/HeaderTextViewStyle"/>
 
         </LinearLayout>
@@ -47,6 +51,7 @@
                 android:hint="@string/search"
                 style="@style/EditTextViewStyle"
                 android:textCursorDrawable="@color/blue"
+                android:textColor="@color/pm_black"
                 android:inputType="text"
                 android:lines="1"
                 android:drawableStart="@drawable/baseline_search_18"

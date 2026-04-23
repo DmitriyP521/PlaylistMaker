@@ -23,10 +23,14 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/back"
+                android:layout_width="@dimen/dp48"
+                android:layout_height="@dimen/dp48"
                 style="@style/BackArrowButtonStyle" />
 
             <TextView
                 android:text="@string/settings"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 style="@style/HeaderTextViewStyle"/>
 
         </LinearLayout>
@@ -38,10 +42,15 @@
             android:orientation="vertical">
 
             <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp61"
                 style="@style/SettingsLinearLayoutStyle">
 
                 <TextView
                     style="@style/SettingsTextViewStyle"
+                    android:layout_width="@dimen/dp0"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:text="@string/dark_theme" />
 
                 <com.google.android.material.switchmaterial.SwitchMaterial
@@ -55,13 +64,20 @@
 
             <LinearLayout
                 android:id="@+id/shareApp"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp61"
                 style="@style/SettingsLinearLayoutStyle">
 
                 <TextView
                     style="@style/SettingsTextViewStyle"
+                    android:layout_width="@dimen/dp0"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:text="@string/share_app"/>
 
                 <ImageView
+                    android:layout_width="@dimen/dp24"
+                    android:layout_height="@dimen/dp24"
                     style="@style/SettingsImageViewStyle"
                     android:src="@drawable/baseline_share_24" />
 
@@ -69,13 +85,20 @@
 
             <LinearLayout
                 android:id="@+id/writeSupp"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp61"
                 style="@style/SettingsLinearLayoutStyle">
 
                 <TextView
                     style="@style/SettingsTextViewStyle"
+                    android:layout_width="@dimen/dp0"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:text="@string/write_supp"/>
 
                 <ImageView
+                    android:layout_width="@dimen/dp24"
+                    android:layout_height="@dimen/dp24"
                     style="@style/SettingsImageViewStyle"
                     android:src="@drawable/baseline_support_agent_24" />
 
@@ -83,13 +106,20 @@
 
             <LinearLayout
                 android:id="@+id/userAgr"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp61"
                 style="@style/SettingsLinearLayoutStyle">
 
                 <TextView
                     style="@style/SettingsTextViewStyle"
+                    android:layout_width="@dimen/dp0"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:text="@string/user_agr"/>
 
                 <ImageView
+                    android:layout_width="@dimen/dp24"
+                    android:layout_height="@dimen/dp24"
                     style="@style/SettingsImageViewStyle"
                     android:src="@drawable/baseline_keyboard_arrow_right_24" />
 
