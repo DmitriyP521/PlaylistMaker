@@ -49,4 +49,13 @@
     <style name="EditTextIconStyle">
         <item name="tint">@color/gray</item>
     </style>
+    <style name="TextViewTrackNameStyle">
+        <item name="android:textColor">@color/black</item>
+    </style>
+    <style name="TextViewArtistStyle">
+        <item name="android:textColor">@color/gray</item>
+    </style>
+    <style name="ImageViewTrackStyle">
+        <item name="android:tint">@color/gray</item>
+    </style>
 </resources>
