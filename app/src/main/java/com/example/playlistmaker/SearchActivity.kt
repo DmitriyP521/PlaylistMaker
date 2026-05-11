@@ -26,17 +26,16 @@ import retrofit2.Call
 import retrofit2.Response
 import retrofit2.converter.gson.GsonConverterFactory
 
+const val ITUNES_BASE_URL = "https://itunes.apple.com/"
 class SearchActivity : AppCompatActivity() {
 
     private var searchString: String = SEARCH_DEF
-    private val ITunesBaseUrl = "https://itunes.apple.com"
     private val retrofit = Retrofit.Builder()
-        .baseUrl(ITunesBaseUrl)
+        .baseUrl(ITUNES_BASE_URL)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 
     private val ItunesApiService = retrofit.create(ITunesApiService::class.java)
-    private val tracks = ArrayList<Track>()
     private val tracksAdapter = TracksAdapter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -57,6 +56,9 @@ class SearchActivity : AppCompatActivity() {
         val errorText = findViewById<TextView>(R.id.error_text)
         val updateBtn = findViewById<Button>(R.id.update_btn)
 
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        recyclerView.adapter = tracksAdapter
+
         fun clearError() {
             errorImage.visibility = View.GONE
             errorText.visibility = View.GONE
@@ -64,6 +66,7 @@ class SearchActivity : AppCompatActivity() {
         }
 
         fun showError(text: String, resImgId: Int, isNetworkError: Boolean) {
+            tracksAdapter.submitList(emptyList())
             errorImage.visibility = View.VISIBLE
             errorText.visibility = View.VISIBLE
             errorImage.setImageResource(resImgId)
@@ -76,12 +79,9 @@ class SearchActivity : AppCompatActivity() {
             if (searchEditText.text.isNotEmpty()) {
                 ItunesApiService.search(searchEditText.text.toString()).enqueue(object : Callback<TracksResponse> {
                     override fun onResponse(call: Call<TracksResponse>, response: Response<TracksResponse>) {
-                        if (response.code() == 200) {
-                            tracks.clear()
-                            if (response.body()?.results?.isNotEmpty() == true) {
-                                tracks.addAll(response.body()?.results!!)
-                                tracksAdapter.notifyDataSetChanged()
-                            }
+                        if (response.isSuccessful) {
+                            val tracks = response.body()?.results ?: emptyList()
+                            tracksAdapter.submitList(tracks)
                             if (tracks.isEmpty()) {
                                 showError(getString(R.string.empty_search), R.drawable.not_found, false)
                             }
@@ -94,9 +94,6 @@ class SearchActivity : AppCompatActivity() {
             }
         }
 
-        tracksAdapter.tracks = tracks
-        recyclerView.layoutManager = LinearLayoutManager(this)
-        recyclerView.adapter = tracksAdapter
 
         backButton.setOnClickListener {
             finish()
@@ -105,8 +102,7 @@ class SearchActivity : AppCompatActivity() {
         clearButton.setOnClickListener {
             searchEditText.setText("")
             searchEditText.clearFocus()
-            tracks.clear()
-            tracksAdapter.notifyDataSetChanged()
+            tracksAdapter.submitList(emptyList())
             clearError()
             val imm = searchEditText.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             imm.hideSoftInputFromWindow(searchEditText.windowToken, 0)

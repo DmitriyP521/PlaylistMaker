@@ -5,7 +5,7 @@ import androidx.recyclerview.widget.RecyclerView
 
 class TracksAdapter() : RecyclerView.Adapter<TracksViewHolder> () {
 
-    var tracks = ArrayList<Track>()
+    private var tracks = listOf<Track>()
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -23,5 +23,10 @@ class TracksAdapter() : RecyclerView.Adapter<TracksViewHolder> () {
 
     override fun getItemCount(): Int {
         return tracks.size
+    }
+
+    fun submitList(newTracks: List<Track>) {
+        tracks = newTracks.toMutableList()
+        notifyDataSetChanged()
     }
 }
