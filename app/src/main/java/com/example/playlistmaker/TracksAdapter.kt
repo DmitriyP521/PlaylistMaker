@@ -3,9 +3,9 @@ package com.example.playlistmaker
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 
-class TracksAdapter(
-    private val tracks: Array<Track>
-) : RecyclerView.Adapter<TracksViewHolder> () {
+class TracksAdapter() : RecyclerView.Adapter<TracksViewHolder> () {
+
+    private var tracks = listOf<Track>()
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -23,5 +23,10 @@ class TracksAdapter(
 
     override fun getItemCount(): Int {
         return tracks.size
+    }
+
+    fun submitList(newTracks: List<Track>) {
+        tracks = newTracks.toMutableList()
+        notifyDataSetChanged()
     }
 }

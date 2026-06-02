@@ -22,13 +22,14 @@ class TracksViewHolder(parent: ViewGroup) : RecyclerView.ViewHolder(
     fun bind(model: Track) {
         trackName.text = model.formattedTrackName
         artistName.text = model.formattedArtistName
-        trackTime.text = model.trackTime
+        trackTime.text = model.formattedTrackTime
         Glide
             .with(itemView)
-            .load(model.artworkUrl100)
+            .load(model.formattedArtworkUrl)
             .fitCenter()
             .transform(RoundedCorners(dpToPx(2f, itemView.context)))
             .placeholder(R.drawable.track_stub)
+            .error(R.drawable.track_stub)
             .into(artworkUrl100)
     }
 }

@@ -58,4 +58,11 @@
     <style name="ImageViewTrackStyle">
         <item name="android:tint">@color/gray</item>
     </style>
+    <style name="ErrorSearchStyle">
+        <item name="android:textColor">@color/pm_black</item>
+    </style>
+    <style name="ButtonUpdate">
+        <item name="android:textColor">@color/white</item>
+        <item name="backgroundTint">@color/pm_black</item>
+    </style>
 </resources>
