@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
+import com.google.android.material.switchmaterial.SwitchMaterial
 
 class SettingsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -24,6 +25,10 @@ class SettingsActivity : AppCompatActivity() {
         val shareAppButton = findViewById<LinearLayout>(R.id.shareApp)
         val writeSupp = findViewById<LinearLayout>(R.id.writeSupp)
         val userAgrButton = findViewById<LinearLayout>(R.id.userAgr)
+        val themeSwitcher = findViewById<SwitchMaterial>(R.id.themeSwitcher)
+        val app = applicationContext as App
+
+        themeSwitcher.isChecked = app.darkTheme
 
         backButton.setOnClickListener {
             finish()
@@ -48,6 +53,10 @@ class SettingsActivity : AppCompatActivity() {
         userAgrButton.setOnClickListener {
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.agr_link)))
             startActivity(intent)
+        }
+
+        themeSwitcher.setOnCheckedChangeListener { switcher, checked ->
+            (applicationContext as App).switchTheme(checked)
         }
     }
 }

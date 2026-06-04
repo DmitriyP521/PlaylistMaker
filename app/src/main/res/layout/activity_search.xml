@@ -78,15 +78,53 @@
 
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="@dimen/dp0"
             android:layout_weight="1"
-            android:layout_marginTop="@dimen/dp16">>
+            android:layout_marginTop="@dimen/dp16">
+
+            <LinearLayout
+                android:id="@+id/historyContainer"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:layout_marginTop="@dimen/dp42"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:text="@string/you_search"
+                    android:textSize="@dimen/sp19"
+                    android:textColor="?attr/colorOnSecondary"
+                    android:fontFamily="@font/ys_display_medium"
+                    android:layout_marginBottom="@dimen/dp12" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/historyRecyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    android:layout_marginTop="@dimen/dp20"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/clear_btn"
+                    android:layout_width="@dimen/dp148"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="@dimen/dp16"
+                    android:layout_marginBottom="@dimen/dp8"
+                    android:text="@string/clear_history"
+                    style="@style/SearchControlButtons" />
+
+            </LinearLayout>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
 
             <LinearLayout
                 android:layout_width="@dimen/dp312"
@@ -117,22 +155,9 @@
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/update_btn"
                     android:layout_width="@dimen/dp91"
-                    android:layout_height="@dimen/dp36"
-                    android:insetTop="@dimen/dp0"
-                    android:insetBottom="@dimen/dp0"
-                    android:gravity="center"
-                    android:layout_gravity="center"
-                    android:layout_marginTop="@dimen/dp24"
-                    android:fontFamily="@font/ys_display_medium"
-                    android:letterSpacing="0"
-                    android:paddingStart="@dimen/dp0"
-                    android:paddingEnd="@dimen/dp0"
                     android:text="@string/update"
-                    android:textAllCaps="false"
-                    android:textSize="@dimen/sp14"
                     android:visibility="gone"
-                    app:cornerRadius="@dimen/dp54"
-                    style="@style/ButtonUpdate"/>
+                    style="@style/SearchControlButtons"/>
 
             </LinearLayout>
 
