@@ -10,10 +10,9 @@ class SearchHistory(private val sharedPreferences: SharedPreferences) {
     private val HISTORY_KEY = "HISTORY_KEY"
 
     fun getHistory(): List<Track> {
-        val json = sharedPreferences.getString(HISTORY_KEY, null)
-        if (json == null) return emptyList()
-        val type = object : TypeToken<ArrayList<Track>>() {}.type
-        return gson.fromJson<ArrayList<Track>>(json, type) ?: emptyList()
+        val json = sharedPreferences.getString(HISTORY_KEY, null) ?: return emptyList()
+        val tracksArray = gson.fromJson(json, Array<Track>::class.java)
+        return tracksArray?.toList() ?: emptyList()
     }
 
     fun addTrack(track: Track) {
