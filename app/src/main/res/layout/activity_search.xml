@@ -97,26 +97,23 @@
                     android:text="@string/you_search"
                     android:textSize="@dimen/sp19"
                     android:textColor="?attr/colorOnSecondary"
-                    android:fontFamily="@font/ys_display_medium"
-                    android:layout_marginBottom="@dimen/dp12" />
+                    android:fontFamily="@font/ys_display_medium"/>
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/historyRecyclerView"
                     android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                     android:layout_marginTop="@dimen/dp20"/>
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/clear_btn"
                     android:layout_width="@dimen/dp148"
-                    android:layout_height="wrap_content"
+                    android:layout_height="@dimen/dp36"
                     android:layout_gravity="center_horizontal"
-                    android:layout_marginTop="@dimen/dp16"
-                    android:layout_marginBottom="@dimen/dp8"
+                    android:layout_marginVertical="@dimen/dp24"
                     android:text="@string/clear_history"
-                    style="@style/SearchControlButtons" />
+                    style="@style/SearchControlButtons"/>
 
             </LinearLayout>
 
