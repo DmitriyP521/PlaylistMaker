@@ -11,6 +11,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -37,6 +38,7 @@ class SearchActivity : AppCompatActivity() {
 
     private val ItunesApiService = retrofit.create(ITunesApiService::class.java)
     private val tracksAdapter = TracksAdapter()
+    private val historyTracksAdapter = TracksAdapter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,6 +50,9 @@ class SearchActivity : AppCompatActivity() {
             insets
         }
 
+        val sharedPrefs = getSharedPreferences(APPLICATION_PREFERENCES, MODE_PRIVATE)
+        val searchHistory = SearchHistory(sharedPrefs)
+
         val searchEditText = findViewById<EditText>(R.id.searchEditText)
         val clearButton = findViewById<FrameLayout>(R.id.clearIcon)
         val backButton = findViewById<Button>(R.id.back)
@@ -55,9 +60,26 @@ class SearchActivity : AppCompatActivity() {
         val errorImage = findViewById<ImageView>(R.id.error_image)
         val errorText = findViewById<TextView>(R.id.error_text)
         val updateBtn = findViewById<Button>(R.id.update_btn)
+        val historyLinear = findViewById<LinearLayout>(R.id.historyContainer)
+        val historyRecyclerView = findViewById<RecyclerView>(R.id.historyRecyclerView)
+        val clearHistoryButton = findViewById<Button>(R.id.clear_btn)
 
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = tracksAdapter
+        historyRecyclerView.layoutManager = LinearLayoutManager(this)
+        historyRecyclerView.adapter = historyTracksAdapter
+
+        fun updateHistoryVisibility() {
+            val showHistory = searchEditText.hasFocus() && searchEditText.text.isEmpty() && !searchHistory.isEmpty()
+
+            historyLinear.visibility = if (showHistory) View.VISIBLE else View.GONE
+
+            recyclerView.visibility = if (showHistory) View.GONE else View.VISIBLE
+
+            if (showHistory) {
+                historyTracksAdapter.submitList(searchHistory.getHistory())
+            }
+        }
 
         fun clearError() {
             errorImage.visibility = View.GONE
@@ -95,6 +117,21 @@ class SearchActivity : AppCompatActivity() {
         }
 
 
+        tracksAdapter.setOnItemClickListener { track ->
+            searchHistory.addTrack(track)
+            updateHistoryVisibility()
+        }
+
+        historyTracksAdapter.setOnItemClickListener { track ->
+            searchHistory.addTrack(track)
+            updateHistoryVisibility()
+        }
+
+        clearHistoryButton.setOnClickListener {
+            searchHistory.clearHistory()
+            updateHistoryVisibility()
+        }
+
         backButton.setOnClickListener {
             finish()
         }
@@ -104,6 +141,7 @@ class SearchActivity : AppCompatActivity() {
             searchEditText.clearFocus()
             tracksAdapter.submitList(emptyList())
             clearError()
+            updateHistoryVisibility()
             val imm = searchEditText.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             imm.hideSoftInputFromWindow(searchEditText.windowToken, 0)
         }
@@ -115,6 +153,7 @@ class SearchActivity : AppCompatActivity() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 clearButton.isVisible = !s.isNullOrEmpty()
                 searchString = s?.toString() ?: SEARCH_DEF
+                updateHistoryVisibility()
             }
 
             override fun afterTextChanged(s: Editable?) {
@@ -133,6 +172,11 @@ class SearchActivity : AppCompatActivity() {
         updateBtn.setOnClickListener {
             search()
         }
+
+        searchEditText.setOnFocusChangeListener { view, hasFocus ->
+            updateHistoryVisibility()
+        }
+
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

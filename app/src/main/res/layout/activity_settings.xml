@@ -55,10 +55,11 @@
                     android:text="@string/dark_theme" />
 
                 <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/themeSwitcher"
                     android:layout_width="@dimen/dp56"
                     android:layout_height="@dimen/dp40"
                     app:switchMinWidth="@dimen/dp35"
-                    android:checked="true"
+                    android:checked="false"
                     style="@style/SwitchMaterialStyle" />
 
             </LinearLayout>
