@@ -1,9 +1,11 @@
 package com.example.playlistmaker
 
-import java.io.Serializable
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 import java.text.SimpleDateFormat
 import java.util.Locale
 
+@Parcelize
 data class Track(
     val trackId: Int?,
     val trackName: String?,
@@ -14,7 +16,7 @@ data class Track(
     val releaseDate: String?,
     val primaryGenreName: String?,
     val country: String?
-) : Serializable
+) : Parcelable
 {
     val formattedTrackName: String
         get() = if (trackName.isNullOrEmpty()) "Unknown"

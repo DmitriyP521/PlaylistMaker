@@ -121,7 +121,7 @@ class SearchActivity : AppCompatActivity() {
             searchHistory.addTrack(track)
             updateHistoryVisibility()
             val intent = Intent(this, AudioPlayerActivity::class.java)
-            intent.putExtra("track", track)
+            intent.putExtra(AudioPlayerActivity.TRACK, track)
             startActivity(intent)
         }
 

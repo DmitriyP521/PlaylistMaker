@@ -31,7 +31,6 @@ class AudioPlayerActivity : AppCompatActivity() {
         val trackNameTextView = findViewById<TextView>(R.id.trackNameTextView)
         val artistNameTextView = findViewById<TextView>(R.id.artistNameTextView)
         val trackDurationTextView = findViewById<TextView>(R.id.trackDurationTextView)
-        val durationLabelTextView = findViewById<TextView>(R.id.durationLabelTextView)
         val durationValueTextView = findViewById<TextView>(R.id.durationValueTextView)
         val albumLabelTextView = findViewById<TextView>(R.id.albumLabelTextView)
         val albumValueTextView = findViewById<TextView>(R.id.albumValueTextView)
@@ -42,7 +41,7 @@ class AudioPlayerActivity : AppCompatActivity() {
         val countryLabelTextView = findViewById<TextView>(R.id.countryLabelTextView)
         val countryValueTextView = findViewById<TextView>(R.id.countryValueTextView)
 
-        var track = intent.getSerializableExtra("track") as Track
+        var track = intent.getParcelableExtra(TRACK, Track::class.java)!!
 
         Glide
             .with(this)
@@ -78,7 +77,7 @@ class AudioPlayerActivity : AppCompatActivity() {
 
         if (track.country == null) {
             countryLabelTextView.visibility = View.GONE
-            countryLabelTextView.visibility = View.GONE
+            countryValueTextView.visibility = View.GONE
         }
 
         backButton.setOnClickListener {
@@ -90,5 +89,9 @@ class AudioPlayerActivity : AppCompatActivity() {
             TypedValue.COMPLEX_UNIT_DIP,
             dp,
             context.resources.displayMetrics).toInt()
+    }
+
+    companion object {
+        const val TRACK = "track"
     }
 }
