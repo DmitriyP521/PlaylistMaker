@@ -1,15 +1,23 @@
 package com.example.playlistmaker
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 import java.text.SimpleDateFormat
 import java.util.Locale
 
+@Parcelize
 data class Track(
     val trackId: Int?,
     val trackName: String?,
     val artistName: String?,
     val trackTimeMillis: Int?,
-    val artworkUrl100: String?
-) {
+    val artworkUrl100: String?,
+    val collectionName: String?,
+    val releaseDate: String?,
+    val primaryGenreName: String?,
+    val country: String?
+) : Parcelable
+{
     val formattedTrackName: String
         get() = if (trackName.isNullOrEmpty()) "Unknown"
                 else if (trackName.length > 21) trackName.take(20) + "..."
@@ -27,4 +35,7 @@ data class Track(
     val formattedArtworkUrl: String
         get() = artworkUrl100 ?: ""
 
+    fun formattedYear() = releaseDate?.take(4)
+
+    fun getCoverArtwork() = artworkUrl100?.replaceAfterLast('/',"512x512bb.jpg")
 }
