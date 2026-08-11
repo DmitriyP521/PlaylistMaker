@@ -3,6 +3,8 @@ package com.example.playlistmaker
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
@@ -13,6 +15,7 @@ import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -22,6 +25,7 @@ import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.coroutines.Runnable
 import retrofit2.Callback
 import retrofit2.Retrofit
 import retrofit2.Call
@@ -40,6 +44,15 @@ class SearchActivity : AppCompatActivity() {
     private val ItunesApiService = retrofit.create(ITunesApiService::class.java)
     private val tracksAdapter = TracksAdapter()
     private val historyTracksAdapter = TracksAdapter()
+    private val handler = Handler(Looper.getMainLooper())
+    private val searchRunnable = Runnable { search() }
+    private var isClickAllowed = true
+
+    private lateinit var searchEditText : EditText
+    private lateinit var errorImage : ImageView
+    private lateinit var errorText : TextView
+    private lateinit var updateBtn : Button
+    private lateinit var progressBar: ProgressBar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,13 +67,14 @@ class SearchActivity : AppCompatActivity() {
         val sharedPrefs = getSharedPreferences(APPLICATION_PREFERENCES, MODE_PRIVATE)
         val searchHistory = SearchHistory(sharedPrefs)
 
-        val searchEditText = findViewById<EditText>(R.id.searchEditText)
+        searchEditText = findViewById(R.id.searchEditText)
+        errorImage = findViewById(R.id.error_image)
+        errorText = findViewById(R.id.error_text)
+        updateBtn = findViewById(R.id.update_btn)
+        progressBar = findViewById(R.id.progressBar)
         val clearButton = findViewById<FrameLayout>(R.id.clearIcon)
         val backButton = findViewById<Button>(R.id.back)
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
-        val errorImage = findViewById<ImageView>(R.id.error_image)
-        val errorText = findViewById<TextView>(R.id.error_text)
-        val updateBtn = findViewById<Button>(R.id.update_btn)
         val historyLinear = findViewById<LinearLayout>(R.id.historyContainer)
         val historyRecyclerView = findViewById<RecyclerView>(R.id.historyRecyclerView)
         val clearHistoryButton = findViewById<Button>(R.id.clear_btn)
@@ -82,47 +96,14 @@ class SearchActivity : AppCompatActivity() {
             }
         }
 
-        fun clearError() {
-            errorImage.visibility = View.GONE
-            errorText.visibility = View.GONE
-            updateBtn.visibility = View.GONE
-        }
-
-        fun showError(text: String, resImgId: Int, isNetworkError: Boolean) {
-            tracksAdapter.submitList(emptyList())
-            errorImage.visibility = View.VISIBLE
-            errorText.visibility = View.VISIBLE
-            errorImage.setImageResource(resImgId)
-            errorText.text = text
-            if (isNetworkError) updateBtn.visibility = View.VISIBLE
-        }
-
-        fun search() {
-            clearError()
-            if (searchEditText.text.isNotEmpty()) {
-                ItunesApiService.search(searchEditText.text.toString()).enqueue(object : Callback<TracksResponse> {
-                    override fun onResponse(call: Call<TracksResponse>, response: Response<TracksResponse>) {
-                        if (response.isSuccessful) {
-                            val tracks = response.body()?.results ?: emptyList()
-                            tracksAdapter.submitList(tracks)
-                            if (tracks.isEmpty()) {
-                                showError(getString(R.string.empty_search), R.drawable.not_found, false)
-                            }
-                        }
-                    }
-                    override fun onFailure(call: Call<TracksResponse?>, t: Throwable) {
-                        showError(getString(R.string.network_error_search), R.drawable.network_error, true)
-                    }
-                })
-            }
-        }
-
         fun adapterAction(track: Track) {
-            searchHistory.addTrack(track)
-            updateHistoryVisibility()
-            val intent = Intent(this, AudioPlayerActivity::class.java)
-            intent.putExtra(AudioPlayerActivity.TRACK, track)
-            startActivity(intent)
+            if (clickDebounce()) {
+                searchHistory.addTrack(track)
+                updateHistoryVisibility()
+                val intent = Intent(this, AudioPlayerActivity::class.java)
+                intent.putExtra(AudioPlayerActivity.TRACK, track)
+                startActivity(intent)
+            }
         }
 
         tracksAdapter.setOnItemClickListener { track ->
@@ -160,6 +141,7 @@ class SearchActivity : AppCompatActivity() {
                 clearButton.isVisible = !s.isNullOrEmpty()
                 searchString = s?.toString() ?: SEARCH_DEF
                 updateHistoryVisibility()
+                searchDebounce()
             }
 
             override fun afterTextChanged(s: Editable?) {
@@ -197,8 +179,61 @@ class SearchActivity : AppCompatActivity() {
         searchEditText.setText(searchString)
     }
 
+    private fun search() {
+        clearError()
+        if (searchEditText.text.isNotEmpty()) {
+            progressBar.visibility = View.VISIBLE
+            ItunesApiService.search(searchEditText.text.toString()).enqueue(object : Callback<TracksResponse> {
+                override fun onResponse(call: Call<TracksResponse>, response: Response<TracksResponse>) {
+                    progressBar.visibility = View.GONE
+                    if (response.isSuccessful) {
+                        val tracks = response.body()?.results ?: emptyList()
+                        tracksAdapter.submitList(tracks)
+                        if (tracks.isEmpty()) {
+                            showError(getString(R.string.empty_search), R.drawable.not_found, false)
+                        }
+                    }
+                }
+                override fun onFailure(call: Call<TracksResponse?>, t: Throwable) {
+                    showError(getString(R.string.network_error_search), R.drawable.network_error, true)
+                }
+            })
+        }
+    }
+
+    private fun clearError() {
+        errorImage.visibility = View.GONE
+        errorText.visibility = View.GONE
+        updateBtn.visibility = View.GONE
+    }
+
+    private fun showError(text: String, resImgId: Int, isNetworkError: Boolean) {
+        tracksAdapter.submitList(emptyList())
+        errorImage.visibility = View.VISIBLE
+        errorText.visibility = View.VISIBLE
+        errorImage.setImageResource(resImgId)
+        errorText.text = text
+        if (isNetworkError) updateBtn.visibility = View.VISIBLE
+    }
+
+    private fun searchDebounce() {
+        handler.removeCallbacks(searchRunnable)
+        handler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY)
+    }
+
+    private fun clickDebounce() : Boolean {
+        val current = isClickAllowed
+        if (isClickAllowed) {
+            isClickAllowed = false
+            handler.postDelayed({ isClickAllowed = true}, CLICK_DEBOUNCE_DELAY)
+        }
+        return current
+    }
+
     companion object {
         const val SEARCH_REQUEST = "SEARCH_REQUEST"
         const val SEARCH_DEF = ""
+        const val SEARCH_DEBOUNCE_DELAY = 2000L
+        const val CLICK_DEBOUNCE_DELAY = 1000L
     }
 }
