@@ -1,4 +1,4 @@
-package com.example.playlistmaker
+package com.example.playlistmaker.ui.settings
 
 import android.content.Intent
 import android.net.Uri
@@ -9,9 +9,15 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
+import com.example.playlistmaker.App
+import com.example.playlistmaker.Creator
+import com.example.playlistmaker.R
+import com.example.playlistmaker.domain.api.SettingsInteractor
 import com.google.android.material.switchmaterial.SwitchMaterial
 
 class SettingsActivity : AppCompatActivity() {
+    private lateinit var settingsInteractor: SettingsInteractor
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
@@ -21,14 +27,15 @@ class SettingsActivity : AppCompatActivity() {
             insets
         }
 
+        settingsInteractor = Creator.provideSettingsInteractor(this)
         val backButton = findViewById<Button>(R.id.back)
         val shareAppButton = findViewById<LinearLayout>(R.id.shareApp)
         val writeSupp = findViewById<LinearLayout>(R.id.writeSupp)
         val userAgrButton = findViewById<LinearLayout>(R.id.userAgr)
         val themeSwitcher = findViewById<SwitchMaterial>(R.id.themeSwitcher)
-        val app = applicationContext as App
+        var settingsInteractor: SettingsInteractor = Creator.provideSettingsInteractor(this)
 
-        themeSwitcher.isChecked = app.darkTheme
+        themeSwitcher.isChecked = settingsInteractor.isDarkThemeEnabled()
 
         backButton.setOnClickListener {
             finish()
@@ -56,6 +63,7 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         themeSwitcher.setOnCheckedChangeListener { switcher, checked ->
+            settingsInteractor.setDarkThemeEnabled(checked)
             (applicationContext as App).switchTheme(checked)
         }
     }

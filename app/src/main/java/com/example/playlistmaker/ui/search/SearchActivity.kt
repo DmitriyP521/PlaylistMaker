@@ -1,6 +1,5 @@
-package com.example.playlistmaker
+package com.example.playlistmaker.ui.search
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
@@ -25,23 +24,18 @@ import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.coroutines.Runnable
-import retrofit2.Callback
-import retrofit2.Retrofit
-import retrofit2.Call
-import retrofit2.Response
-import retrofit2.converter.gson.GsonConverterFactory
+import com.example.playlistmaker.APPLICATION_PREFERENCES
+import com.example.playlistmaker.Creator
+import com.example.playlistmaker.R
+import com.example.playlistmaker.domain.api.HistorySearchInteractor
+import com.example.playlistmaker.domain.api.TracksInteractor
+import com.example.playlistmaker.domain.models.Track
+import com.example.playlistmaker.ui.audioPlayer.AudioPlayerActivity
 
-const val ITUNES_BASE_URL = "https://itunes.apple.com/"
 class SearchActivity : AppCompatActivity() {
 
     private var searchString: String = SEARCH_DEF
-    private val retrofit = Retrofit.Builder()
-        .baseUrl(ITUNES_BASE_URL)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
 
-    private val ItunesApiService = retrofit.create(ITunesApiService::class.java)
     private val tracksAdapter = TracksAdapter()
     private val historyTracksAdapter = TracksAdapter()
     private val handler = Handler(Looper.getMainLooper())
@@ -53,6 +47,8 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var errorText : TextView
     private lateinit var updateBtn : Button
     private lateinit var progressBar: ProgressBar
+    private lateinit var tracksInteractor :TracksInteractor
+    private lateinit var historyInteractor: HistorySearchInteractor
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,9 +59,6 @@ class SearchActivity : AppCompatActivity() {
             view.updatePadding(top = statusBar.top)
             insets
         }
-
-        val sharedPrefs = getSharedPreferences(APPLICATION_PREFERENCES, MODE_PRIVATE)
-        val searchHistory = SearchHistory(sharedPrefs)
 
         searchEditText = findViewById(R.id.searchEditText)
         errorImage = findViewById(R.id.error_image)
@@ -79,26 +72,30 @@ class SearchActivity : AppCompatActivity() {
         val historyRecyclerView = findViewById<RecyclerView>(R.id.historyRecyclerView)
         val clearHistoryButton = findViewById<Button>(R.id.clear_btn)
 
+        tracksInteractor = Creator.provideTracksInteractor()
+        historyInteractor = Creator.provideHistoryInteractor(this)
+
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = tracksAdapter
         historyRecyclerView.layoutManager = LinearLayoutManager(this)
         historyRecyclerView.adapter = historyTracksAdapter
 
         fun updateHistoryVisibility() {
-            val showHistory = searchEditText.hasFocus() && searchEditText.text.isEmpty() && !searchHistory.isEmpty()
+            val showHistory = searchEditText.hasFocus() && searchEditText.text.isEmpty() &&
+                    historyInteractor.getHistory().isNotEmpty()
 
             historyLinear.visibility = if (showHistory) View.VISIBLE else View.GONE
 
             recyclerView.visibility = if (showHistory) View.GONE else View.VISIBLE
 
             if (showHistory) {
-                historyTracksAdapter.submitList(searchHistory.getHistory())
+                historyTracksAdapter.submitList(historyInteractor.getHistory())
             }
         }
 
         fun adapterAction(track: Track) {
             if (clickDebounce()) {
-                searchHistory.addTrack(track)
+                historyInteractor.addTrack(track)
                 updateHistoryVisibility()
                 val intent = Intent(this, AudioPlayerActivity::class.java)
                 intent.putExtra(AudioPlayerActivity.TRACK, track)
@@ -115,7 +112,7 @@ class SearchActivity : AppCompatActivity() {
         }
 
         clearHistoryButton.setOnClickListener {
-            searchHistory.clearHistory()
+            historyInteractor.clearHistory()
             updateHistoryVisibility()
         }
 
@@ -129,7 +126,7 @@ class SearchActivity : AppCompatActivity() {
             tracksAdapter.submitList(emptyList())
             clearError()
             updateHistoryVisibility()
-            val imm = searchEditText.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            val imm = searchEditText.context.getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
             imm.hideSoftInputFromWindow(searchEditText.windowToken, 0)
         }
 
@@ -183,19 +180,22 @@ class SearchActivity : AppCompatActivity() {
         clearError()
         if (searchEditText.text.isNotEmpty()) {
             progressBar.visibility = View.VISIBLE
-            ItunesApiService.search(searchEditText.text.toString()).enqueue(object : Callback<TracksResponse> {
-                override fun onResponse(call: Call<TracksResponse>, response: Response<TracksResponse>) {
-                    progressBar.visibility = View.GONE
-                    if (response.isSuccessful) {
-                        val tracks = response.body()?.results ?: emptyList()
-                        tracksAdapter.submitList(tracks)
-                        if (tracks.isEmpty()) {
+            tracksInteractor.searchTracks(searchEditText.text.toString(), object : TracksInteractor.TracksConsumer {
+                override fun consume(foundTracks: List<Track>) {
+                    runOnUiThread {
+                        progressBar.visibility = View.GONE
+                        tracksAdapter.submitList(foundTracks)
+                        if (foundTracks.isEmpty()) {
                             showError(getString(R.string.empty_search), R.drawable.not_found, false)
                         }
                     }
                 }
-                override fun onFailure(call: Call<TracksResponse?>, t: Throwable) {
-                    showError(getString(R.string.network_error_search), R.drawable.network_error, true)
+
+                override fun onError(error: Throwable) {
+                    runOnUiThread {
+                        progressBar.visibility = View.GONE
+                        showError(getString(R.string.network_error_search), R.drawable.network_error, true)
+                    }
                 }
             })
         }
